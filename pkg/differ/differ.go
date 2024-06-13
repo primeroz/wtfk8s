@@ -15,9 +15,10 @@ import (
 type Differ struct {
 	cache  map[string]runtime.Object
 	mapper meta.RESTMapper
+	prettyPrint bool
 }
 
-func New(clients *clients.Clients) (*Differ, error) {
+func New(clients *clients.Clients, pretty *bool) (*Differ, error) {
 	mapper, err := clients.ToRESTMapper()
 	if err != nil {
 		return nil, err
@@ -25,6 +26,7 @@ func New(clients *clients.Clients) (*Differ, error) {
 	return &Differ{
 		cache:  map[string]runtime.Object{},
 		mapper: mapper,
+		prettyPrint: *pretty,
 	}, nil
 }
 
@@ -67,7 +69,21 @@ func (d *Differ) Print(obj runtime.Object) error {
 	}
 
 	if string(patch) != "{}" {
-		fmt.Printf("%s %s %s\n", meta.GetResourceVersion(), printKey, patch)
+    patchToPrint := patch
+
+    if d.prettyPrint {
+
+      var result map[string]interface{}
+      if err := json.Unmarshal([]byte(patch), &result); err != nil {
+        return err
+      }
+
+      patchToPrint, err = json.MarshalIndent(result, "", "  ")
+	    if err != nil {
+	    	return err
+	    }
+    }
+		fmt.Printf("%s %s %s\n", meta.GetResourceVersion(), printKey, patchToPrint)
 	}
 
 	return nil

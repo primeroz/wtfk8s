@@ -20,6 +20,7 @@ var (
 	kubeConfig = flag.String("kubeconfig", "", "Kube config location")
 	context    = flag.String("context", "", "Kube config context")
 	namespace  = flag.String("namespace", "", "Limit to namespace")
+	pretty     = flag.Bool("pretty", false, "Pretty Print json")
 )
 
 func main() {
@@ -52,7 +53,7 @@ func mainErr() error {
 		watcher.MatchName(arg)
 	}
 
-	differ, err := differ.New(clients)
+	differ, err := differ.New(clients, pretty)
 	if err != nil {
 		return err
 	}
