@@ -13,8 +13,8 @@ import (
 )
 
 type Differ struct {
-	cache  map[string]runtime.Object
-	mapper meta.RESTMapper
+	cache       map[string]runtime.Object
+	mapper      meta.RESTMapper
 	prettyPrint bool
 }
 
@@ -24,8 +24,8 @@ func New(clients *clients.Clients, pretty *bool) (*Differ, error) {
 		return nil, err
 	}
 	return &Differ{
-		cache:  map[string]runtime.Object{},
-		mapper: mapper,
+		cache:       map[string]runtime.Object{},
+		mapper:      mapper,
 		prettyPrint: *pretty,
 	}, nil
 }
@@ -69,20 +69,20 @@ func (d *Differ) Print(obj runtime.Object) error {
 	}
 
 	if string(patch) != "{}" {
-    patchToPrint := patch
+		patchToPrint := patch
 
-    if d.prettyPrint {
+		if d.prettyPrint {
 
-      var result map[string]interface{}
-      if err := json.Unmarshal([]byte(patch), &result); err != nil {
-        return err
-      }
+			var result map[string]interface{}
+			if err := json.Unmarshal([]byte(patch), &result); err != nil {
+				return err
+			}
 
-      patchToPrint, err = json.MarshalIndent(result, "", "  ")
-	    if err != nil {
-	    	return err
-	    }
-    }
+			patchToPrint, err = json.MarshalIndent(result, "", "  ")
+			if err != nil {
+				return err
+			}
+		}
 		fmt.Printf("%s %s %s\n", meta.GetResourceVersion(), printKey, patchToPrint)
 	}
 
